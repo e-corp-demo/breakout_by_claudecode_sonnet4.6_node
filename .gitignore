@@ -1,3 +1,7 @@
+public/uploads/*
+.claude
+claude_session_id
+
 # Logs
 logs
 *.log

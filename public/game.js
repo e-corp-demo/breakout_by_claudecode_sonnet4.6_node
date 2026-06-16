@@ -48,12 +48,16 @@ const STARS = Array.from({ length: 90 }, () => ({
 
 // ─── Game state ──────────────────────────────────────────────────────────────
 
-let state            = 'waiting'; // waiting | playing | dead | gameover | win
+let state            = 'waiting'; // waiting | playing | dead | levelup | paused | gameover
 let score            = 0;
 let lives            = 3;
+let level            = 1;
 let bgImage          = null;
 let showingNameInput = false;
 let hiScore          = 0;
+
+const BASE_SPEED = 5;
+let levelSpeed   = BASE_SPEED;
 
 const paddle = { x: (W - PADDLE_W) / 2, dx: 0 };
 
@@ -123,9 +127,20 @@ function updateParticles() {
 
 function launchBall() {
   const angle = -Math.PI / 2 + (Math.random() - 0.5) * (Math.PI / 4);
-  const spd   = 5;
-  ball.dx = Math.cos(angle) * spd;
-  ball.dy = Math.sin(angle) * spd;
+  ball.dx = Math.cos(angle) * levelSpeed;
+  ball.dy = Math.sin(angle) * levelSpeed;
+}
+
+function resetGame() {
+  score      = 0;
+  lives      = 3;
+  level      = 1;
+  levelSpeed = BASE_SPEED;
+  paddle.x   = (W - PADDLE_W) / 2;
+  paddle.dx  = 0;
+  particles  = [];
+  buildBricks();
+  resetBallToPaddle(); // sets state = 'waiting'
 }
 
 function resetBallToPaddle() {
@@ -211,10 +226,15 @@ function update() {
     break; // one brick per frame prevents tunnelling artifacts
   }
 
-  // Win check
+  // All bricks cleared → advance level
   if (bricks.every(b => !b.alive)) {
-    state = 'win';
-    showNameInput('YOU WIN!');
+    level     += 1;
+    levelSpeed = BASE_SPEED + (level - 1) * 0.5;
+    state      = 'levelup';
+    setTimeout(() => {
+      buildBricks();
+      resetBallToPaddle();
+    }, 1800);
   }
 
   updateParticles();
@@ -463,7 +483,11 @@ function drawHUD() {
   ctx.textAlign   = 'right';
   ctx.fillStyle   = '#ff00ff';
   ctx.shadowColor = '#ff00ff';
-  ctx.fillText(`HI  ${String(Math.max(hiScore, score)).padStart(6, '0')}`, W - 16, 28);
+  ctx.fillText(`LVL  ${String(level).padStart(2, '0')}`, W - 16, 28);
+  ctx.font        = '12px "Courier New", monospace';
+  ctx.fillStyle   = 'rgba(255,0,255,0.5)';
+  ctx.shadowBlur  = 6;
+  ctx.fillText(`HI  ${String(Math.max(hiScore, score)).padStart(6, '0')}`, W - 16, 48);
 
   ctx.shadowBlur = 0;
   ctx.restore();
@@ -502,6 +526,31 @@ function drawOverlay(line1, line2, line3 = '') {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function drawLevelUp() {
+  ctx.fillStyle = 'rgba(0,0,15,0.6)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.textAlign   = 'center';
+  ctx.font        = 'bold 52px "Courier New", monospace';
+  ctx.shadowBlur  = 35;
+  ctx.shadowColor = '#00ffff';
+  ctx.fillStyle   = '#00ffff';
+  ctx.fillText(`LEVEL  ${level}`, W / 2, H / 2 - 22);
+
+  ctx.font        = '16px "Courier New", monospace';
+  ctx.shadowBlur  = 14;
+  ctx.shadowColor = '#ff00ff';
+  ctx.fillStyle   = '#ff00ff';
+  ctx.fillText('GET READY', W / 2, H / 2 + 20);
+
+  ctx.font        = '12px "Courier New", monospace';
+  ctx.fillStyle   = 'rgba(0,255,255,0.4)';
+  ctx.shadowBlur  = 0;
+  ctx.fillText(`BALL SPEED  ×${levelSpeed.toFixed(1)}`, W / 2, H / 2 + 48);
+  ctx.restore();
+}
 
 function roundRect(x, y, w, h, r) {
   ctx.beginPath();
@@ -548,10 +597,12 @@ function gameLoop() {
     ctx.shadowColor = '#ff3333';
     ctx.fillText('BALL LOST', W / 2, H / 2);
     ctx.restore();
+  } else if (state === 'paused') {
+    drawOverlay('PAUSED', 'SPACE  RESUME', 'ESC  QUIT TO MENU');
+  } else if (state === 'levelup') {
+    drawLevelUp();
   } else if (state === 'gameover') {
     drawOverlay('GAME OVER', `FINAL SCORE  ${String(score).padStart(6, '0')}`, 'CLICK OR SPACE TO RETRY');
-  } else if (state === 'win') {
-    drawOverlay('YOU WIN!', `SCORE  ${String(score).padStart(6, '0')}`, 'CLICK OR SPACE TO PLAY AGAIN');
   }
 
   requestAnimationFrame(gameLoop);
@@ -562,9 +613,18 @@ function gameLoop() {
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft')  { paddle.dx = -PADDLE_SPEED; e.preventDefault(); }
   if (e.key === 'ArrowRight') { paddle.dx =  PADDLE_SPEED; e.preventDefault(); }
+
   if (e.key === ' ') {
     e.preventDefault();
+    if (showingNameInput) return;
+    if (state === 'playing') { state = 'paused'; return; }
+    if (state === 'paused')  { state = 'playing'; return; }
     handleAction();
+  }
+
+  if (e.key === 'Escape') {
+    if (showingNameInput) { hideNameInput(); return; }
+    if (['playing', 'paused', 'dead', 'levelup'].includes(state)) resetGame();
   }
 });
 
@@ -586,14 +646,8 @@ function handleAction() {
   if (state === 'waiting') {
     launchBall();
     state = 'playing';
-  } else if (state === 'gameover' || state === 'win') {
-    score  = 0;
-    lives  = 3;
-    paddle.x = (W - PADDLE_W) / 2;
-    paddle.dx = 0;
-    particles = [];
-    buildBricks();
-    resetBallToPaddle();
+  } else if (state === 'gameover') {
+    resetGame();
   }
 }
 
