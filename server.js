@@ -48,7 +48,7 @@ app.post('/scores', (req, res) => {
   if (typeof score !== 'number' || !name) return res.status(400).json({ error: 'Invalid' });
   const scores = readScores();
   scores.push({
-    name: String(name).slice(0, 12).toUpperCase().replace(/[^A-Z0-9 _\-]/g, ''),
+    name: String(name).slice(0, 12).toUpperCase().replace(/[^A-Z0-9 _-]/g, ''),
     score: Math.floor(score),
     date: new Date().toISOString().slice(0, 10),
   });
