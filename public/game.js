@@ -214,8 +214,7 @@ function update() {
   }
 
   // Brick collisions
-  for (let i = 0; i < bricks.length; i++) {
-    const b = bricks[i];
+  for (const b of bricks) {
     if (!b.alive) continue;
     if (!aabbOverlap(b)) continue;
 
