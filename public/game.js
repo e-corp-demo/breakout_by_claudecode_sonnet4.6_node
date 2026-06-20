@@ -143,6 +143,18 @@ function resetGame() {
   resetBallToPaddle(); // sets state = 'waiting'
 }
 
+function handleBrickCollisions() {
+  for (const b of bricks) {
+    if (!b.alive) continue;
+    if (!aabbOverlap(b)) continue;
+    b.alive = false;
+    score  += ROW_THEMES[b.row].pts;
+    spawnParticles(b);
+    resolveAABB(b);
+    break; // one brick per frame prevents tunnelling artifacts
+  }
+}
+
 function resetBallToPaddle() {
   ball.x  = paddle.x + PADDLE_W / 2;
   ball.y  = PADDLE_Y - BALL_RADIUS - 2;
@@ -214,17 +226,7 @@ function update() {
   }
 
   // Brick collisions
-  for (let i = 0; i < bricks.length; i++) {
-    const b = bricks[i];
-    if (!b.alive) continue;
-    if (!aabbOverlap(b)) continue;
-
-    b.alive = false;
-    score  += ROW_THEMES[b.row].pts;
-    spawnParticles(b);
-    resolveAABB(b);
-    break; // one brick per frame prevents tunnelling artifacts
-  }
+  handleBrickCollisions();
 
   // All bricks cleared → advance level
   if (bricks.every(b => !b.alive)) {
@@ -567,7 +569,7 @@ function roundRect(x, y, w, h, r) {
 }
 
 function shadeHex(hex, amount) {
-  const n = parseInt(hex.replace('#', ''), 16);
+  const n = Number.parseInt(hex.replace('#', ''), 16);
   const r = Math.max(0, Math.min(255, (n >> 16) + amount));
   const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amount));
   const b = Math.max(0, Math.min(255, (n & 0xff) + amount));
@@ -755,5 +757,5 @@ document.getElementById('bgUpload').addEventListener('change', async e => {
 
 buildBricks();
 resetBallToPaddle();
-loadScores();
+await loadScores();
 gameLoop();

@@ -92,14 +92,21 @@ Let's build a Breakout game. I want the graphics to look premium and arcade-poli
 
 Implement these exact graphic rules using native Canvas rendering:
 
-For the canvas background, create a deep dark space gradient with a subtle neon grid overlay drawn via loops.
-For the paddle and blocks, do not use flat colors. Use `ctx.createLinearGradient` to create bright neon gradients (e.g., Cyberpunk pink to purple, or electric cyan to deep blue).
-Apply a glowing bloom effect to the ball, paddle, and active bricks by configuring `ctx.shadowBlur = 15` and a matching `ctx.shadowColor` right before drawing them, then resetting it so performance doesn't tank.
-When a brick breaks, don't just delete it. Spawn 5–10 tiny particle objects at its coordinates that fly outwards, fade out over 20 frames, and delete themselves.
-Write the complete code structure cleanly with standard physics collision loops.
+* For the canvas background, create a deep dark space gradient with a subtle neon grid overlay drawn via loops.
+* For the paddle and blocks, do not use flat colors. Use ctx.createLinearGradient to create bright neon gradients (e.g., Cyberpunk pink to purple, or electric cyan to deep blue).
+Apply a glowing bloom effect to the ball, paddle, and active bricks by configuring ctx.shadowBlur = 15; and a matching ctx.shadowColor right before drawing them, then resetting it so performance doesn't tank.
+* When a brick breaks, don't just delete it. Spawn 5-10 tiny particle objects at its coordinates that fly outwards, fade out over 20 frames, and delete themselves.
+* Write the complete code structure cleanly with standard physics collision loops.
+
+Game logic:
+When all bricks are cleared, the game should not end but move to the next level: new bricks get set and the pace increases slightly. The game only ends when the user has no lives left.
+When the game is over, ask the user for its name to save it into the highscore. We need to display the highscore on the right side of the game.
+
+Game Controls:
+The user can play with mouse or keys (left, right). Space starts the game.
+Add additional a hotkey: Esc shall abort the current game and go back to the start screen. The Space key during the game shall pause the game. 
 
 I want to be able to optionally upload a background image. So make it a Node.js app with a lightweight server.
 
-The user can play with mouse or keys (left, right). Space starts the game.
-Add additional a hotkey: Esc shall abort the current game and go back to the start screen. The Space key during the game shall pause the game. When all bricks are cleared, the game should not end but move to the next level: new bricks get set and the pace increases slightly. The game only ends when the user has no lives left.
+Important: Make sure that the code is of high quality and has no security or quality issues. Use Sonar MCP server to find and fix any issues, both SAST issues, quality issues, and dependency risks. You are only done when Sonar MCP does not report any issues anymore.
 ```
