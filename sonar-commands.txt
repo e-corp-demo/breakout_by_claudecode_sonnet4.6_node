@@ -1,0 +1,6 @@
+sonar integrate claude
+sonar analyze secrets .
+sonar analyze agentic --file ./server.js --project e-corp-demo_breakout_pi_4
+sonar analyze dependency-risks --project e-corp-demo_breakout_pi_4
+sonar remediate
+sonar context architecture get-current | jq .

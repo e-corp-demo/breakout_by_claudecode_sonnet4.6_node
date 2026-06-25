@@ -11,6 +11,13 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+node_modules/debug/.coveralls.yml
+
+# Claude Code / tooling
+claude_session_id
+.claude/settings.local.json
+public/uploads/
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
