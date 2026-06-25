@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - dev
+      - intentional-issues
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
