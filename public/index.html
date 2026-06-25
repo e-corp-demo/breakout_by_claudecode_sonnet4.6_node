@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BREAKOUT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="game-header">
+      <h1 class="title">BREAKOUT</h1>
+      <label class="upload-btn" id="uploadLabel">
+        <input type="file" id="bgUpload" accept="image/*" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Upload Background</span>
+      </label>
+    </div>
+    <div class="game-body">
+      <div class="canvas-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="name-overlay hidden" id="nameOverlay">
+          <div class="name-box">
+            <div class="name-result" id="nameResult">GAME OVER</div>
+            <div class="name-score-display" id="nameScoreDisplay">000000</div>
+            <label for="nameInput" class="name-prompt">ENTER YOUR NAME</label>
+            <input type="text" id="nameInput" maxlength="12" placeholder="PLAYER"
+                   autocomplete="off" spellcheck="false">
+            <div class="name-actions">
+              <button id="nameSubmit">SAVE SCORE</button>
+              <button id="nameSkip">SKIP</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="leaderboard" id="leaderboard">
+        <div class="lb-header">HIGH SCORES</div>
+        <ol id="scoreList"></ol>
+      </div>
+    </div>
+    <div class="controls-hint">← → or Mouse to move &nbsp;·&nbsp; Space / Click to launch</div>
+  </div>
+  <script type="module" src="game.js"></script>
+</body>
+</html>

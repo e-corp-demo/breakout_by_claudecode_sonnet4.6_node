@@ -1,0 +1,14 @@
+{
+  "name": "breakout-pi-4",
+  "version": "1.0.0",
+  "description": "Premium arcade Breakout game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^2.2.0"
+  }
+}
